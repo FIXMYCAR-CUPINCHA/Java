@@ -15,7 +15,7 @@ import fiap.com.br.SentinelTrack.Application.services.MotoService;
 import fiap.com.br.SentinelTrack.Application.services.PatioService;
 import fiap.com.br.SentinelTrack.Application.services.JwtService;
 import lombok.extern.slf4j.Slf4j;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * Controller REST para APIs gerais do Mobile App
