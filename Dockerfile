@@ -1,32 +1,26 @@
-# Dockerfile para SentinelTrack Java API
-# Challenge 2025 - 4º Sprint
+# Dockerfile para SentinelTrack Java API - Challenge 2025
+FROM eclipse-temurin:17-jdk-alpine
 
-# Build stage
-FROM gradle:8.5-jdk17 AS build
 WORKDIR /app
+
+# Copiar arquivos do projeto
 COPY . .
-RUN gradle clean build -x test
 
-# Runtime stage
-FROM eclipse-temurin:17-jre-alpine
-WORKDIR /app
+# Dar permissão aos scripts
+RUN chmod +x ./gradlew ./build.sh ./start.sh
 
-# Instalar dependências necessárias (Alpine Linux)
+# Instalar curl para health check
 RUN apk add --no-cache curl
 
-# Copiar JAR da aplicação
-COPY --from=build /app/build/libs/*.jar app.jar
-
-# Criar usuário não-root (Alpine Linux)
-RUN addgroup -S spring && adduser -S spring -G spring
-USER spring:spring
+# Build da aplicação
+RUN ./gradlew clean build -x test
 
 # Expor porta
 EXPOSE 8080
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:8080/api/mobile/health || exit 1
 
-# Comando para executar a aplicação
-ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "/app/app.jar"]
+# Comando para executar
+CMD ["java", "-Dserver.port=${PORT:-8080}", "-Dspring.profiles.active=prod", "-jar", "build/libs/SentinelTrack-0.0.1-SNAPSHOT.jar"]
