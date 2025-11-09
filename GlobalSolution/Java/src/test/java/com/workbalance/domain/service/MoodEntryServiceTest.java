@@ -37,7 +37,7 @@ class MoodEntryServiceTest {
     @BeforeEach
     void setUp() {
         userId = UUID.randomUUID();
-        principal = new UserPrincipal(userId, "test@example.com", "password", null);
+        principal = new UserPrincipal(userId, "Test User", "test@example.com", "password", java.util.Collections.emptyList());
     }
 
     @Test

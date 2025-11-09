@@ -51,7 +51,7 @@ class RecommendationServiceTest {
     @BeforeEach
     void setUp() {
         userId = UUID.randomUUID();
-        principal = new UserPrincipal(userId, "test@example.com", "password", List.of());
+        principal = new UserPrincipal(userId, "Test User", "test@example.com", "password", List.of());
     }
 
     @Test
