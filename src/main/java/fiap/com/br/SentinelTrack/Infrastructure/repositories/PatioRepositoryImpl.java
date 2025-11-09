@@ -28,4 +28,9 @@ public class PatioRepositoryImpl implements PatioRepository {
     public void deleteById(Long id) {
         jpaRepository.deleteById(id);
     }
+    
+    @Override
+    public List<Patio> findByNomeContainingIgnoreCase(String nome) {
+        return jpaRepository.findByNomeContainingIgnoreCase(nome);
+    }
 }

@@ -1,6 +1,7 @@
 package fiap.com.br.SentinelTrack.Application.mapper;
 
 import fiap.com.br.SentinelTrack.Application.dto.CreatePatioDTO;
+import fiap.com.br.SentinelTrack.Application.dto.UpdatePatioDTO;
 import fiap.com.br.SentinelTrack.Application.dto.PatioDTO;
 import fiap.com.br.SentinelTrack.Domain.models.Patio;
 import org.springframework.stereotype.Component;
@@ -50,6 +51,16 @@ public class PatioMapper {
     }
     
     public void updateEntity(Patio patio, CreatePatioDTO updateDTO) {
+        if (patio == null || updateDTO == null) return;
+        
+        patio.setNome(updateDTO.getNome());
+        patio.setEndereco(updateDTO.getEndereco());
+        patio.setComplemento(updateDTO.getComplemento());
+        patio.setAreaM2(updateDTO.getAreaM2());
+        patio.setIdLocalidade(updateDTO.getIdLocalidade());
+    }
+    
+    public void updateEntity(Patio patio, UpdatePatioDTO updateDTO) {
         if (patio == null || updateDTO == null) return;
         
         patio.setNome(updateDTO.getNome());
