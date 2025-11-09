@@ -69,9 +69,12 @@ public class PatioService {
                 .collect(Collectors.toList());
     }
 
-    // Métodos para uso interno (retornam entidades)
-    public List<Patio> listar() {
-        return repository.findAll();
+    // Método público retorna DTOs
+    public List<PatioDTO> listar() {
+        return repository.findAll()
+                .stream()
+                .map(mapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     public Optional<Patio> buscarEntidadePorId(Long id) {

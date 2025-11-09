@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import fiap.com.br.SentinelTrack.Application.dto.PatioDTO;
 import fiap.com.br.SentinelTrack.Application.services.PatioService;
-import fiap.com.br.SentinelTrack.Domain.models.Patio;
 
 @RestController
 @RequestMapping("/patios")
@@ -20,7 +20,7 @@ public class PatioController {
     }
 
     @GetMapping
-    public List<Patio> listar() {
+    public List<PatioDTO> listar() {
         return patioService.listar();
     }
 }
