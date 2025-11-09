@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head}">
+    <title>Formulário de Moto - SentinelTrack</title>
+</head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container mt-4">
+        <!-- Cabeçalho -->
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="h3">
+                    <i class="bi bi-motorcycle"></i> 
+                    <span th:text="${isEdit ? 'Editar Moto' : 'Nova Moto'}">Nova Moto</span>
+                </h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/dashboard}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/motos}">Motos</a></li>
+                        <li class="breadcrumb-item active" th:text="${isEdit ? 'Editar' : 'Nova'}">Nova</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Alertas -->
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Formulário -->
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-file-earmark-text"></i> Dados da Moto
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="${isEdit ? '/motos/edit/' + motoId : '/motos/new'}" 
+                              th:object="${moto}" 
+                              method="post">
+                            
+                            <div class="row">
+                                <!-- Placa -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="placa" class="form-label">
+                                        Placa <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           th:classappend="${#fields.hasErrors('placa')} ? 'is-invalid' : ''"
+                                           id="placa" 
+                                           th:field="*{placa}" 
+                                           placeholder="ABC1234 ou ABC1D23"
+                                           maxlength="7"
+                                           required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('placa')}" th:errors="*{placa}">
+                                        Erro de validação
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        Formato: ABC1234 (antigo) ou ABC1D23 (Mercosul)
+                                    </small>
+                                </div>
+
+                                <!-- Modelo -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="modelo" class="form-label">
+                                        Modelo <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           th:classappend="${#fields.hasErrors('modelo')} ? 'is-invalid' : ''"
+                                           id="modelo" 
+                                           th:field="*{modelo}" 
+                                           placeholder="Ex: Honda CG 160"
+                                           required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('modelo')}" th:errors="*{modelo}">
+                                        Erro de validação
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Status -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="status" class="form-label">
+                                        Status <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" 
+                                            th:classappend="${#fields.hasErrors('status')} ? 'is-invalid' : ''"
+                                            id="status" 
+                                            th:field="*{status}" 
+                                            required>
+                                        <option value="">Selecione...</option>
+                                        <option value="DISPONIVEL">Disponível</option>
+                                        <option value="EM_USO">Em Uso</option>
+                                        <option value="MANUTENCAO">Manutenção</option>
+                                    </select>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('status')}" th:errors="*{status}">
+                                        Erro de validação
+                                    </div>
+                                </div>
+
+                                <!-- Pátio -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="idPatio" class="form-label">
+                                        Pátio <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" 
+                                            th:classappend="${#fields.hasErrors('idPatio')} ? 'is-invalid' : ''"
+                                            id="idPatio" 
+                                            th:field="*{idPatio}" 
+                                            required>
+                                        <option value="">Selecione...</option>
+                                        <option th:each="patio : ${patios}" 
+                                                th:value="${patio.id}" 
+                                                th:text="${patio.nome}">
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('idPatio')}" th:errors="*{idPatio}">
+                                        Erro de validação
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Data de Entrada -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="dataEntrada" class="form-label">
+                                        Data de Entrada <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="date" 
+                                           class="form-control" 
+                                           th:classappend="${#fields.hasErrors('dataEntrada')} ? 'is-invalid' : ''"
+                                           id="dataEntrada" 
+                                           th:field="*{dataEntrada}" 
+                                           required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('dataEntrada')}" th:errors="*{dataEntrada}">
+                                        Erro de validação
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <!-- Botões -->
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/motos}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Voltar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle"></i> 
+                                    <span th:text="${isEdit ? 'Atualizar' : 'Cadastrar'}">Cadastrar</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Card de Ajuda -->
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6><i class="bi bi-info-circle"></i> Informações</h6>
+                        <ul class="mb-0 small">
+                            <li><strong>Placa:</strong> Aceita formato antigo (ABC1234) e Mercosul (ABC1D23)</li>
+                            <li><strong>Status:</strong> Define a disponibilidade da moto na frota</li>
+                            <li><strong>Pátio:</strong> Local onde a moto está alocada</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+    
+    <script>
+        // Máscara para placa
+        document.getElementById('placa').addEventListener('input', function(e) {
+            let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html>

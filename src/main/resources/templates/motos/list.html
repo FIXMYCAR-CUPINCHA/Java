@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head}">
+    <title>Motos - SentinelTrack</title>
+</head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container mt-4">
+        <!-- Cabeçalho -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h1 class="h3">
+                    <i class="bi bi-motorcycle"></i> Gestão de Motos
+                </h1>
+                <p class="text-muted">Gerencie a frota de motocicletas da Mottu</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a th:href="@{/motos/new}" class="btn btn-primary" sec:authorize="hasAnyRole('ADMIN', 'GERENTE', 'OPERADOR')">
+                    <i class="bi bi-plus-circle"></i> Nova Moto
+                </a>
+            </div>
+        </div>
+
+        <!-- Alertas -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle"></i> <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form th:action="@{/motos}" method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="busca" class="form-label">Buscar por Placa/Modelo</label>
+                        <input type="text" class="form-control" id="busca" name="busca" 
+                               th:value="${busca}" placeholder="Digite placa ou modelo">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">Todos</option>
+                            <option value="DISPONIVEL" th:selected="${status == 'DISPONIVEL'}">Disponível</option>
+                            <option value="EM_USO" th:selected="${status == 'EM_USO'}">Em Uso</option>
+                            <option value="MANUTENCAO" th:selected="${status == 'MANUTENCAO'}">Manutenção</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="patio" class="form-label">Pátio</label>
+                        <select class="form-select" id="patio" name="idPatio">
+                            <option value="">Todos</option>
+                            <option th:each="patio : ${patios}" 
+                                    th:value="${patio.id}" 
+                                    th:text="${patio.nome}"
+                                    th:selected="${idPatio == patio.id}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i> Buscar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Estatísticas Rápidas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5 th:text="${totalMotos}">0</h5>
+                        <small>Total de Motos</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <h5 th:text="${motosDisponiveis}">0</h5>
+                        <small>Disponíveis</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h5 th:text="${motosEmUso}">0</h5>
+                        <small>Em Uso</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body">
+                        <h5 th:text="${motosManutencao}">0</h5>
+                        <small>Manutenção</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela de Motos -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-list-ul"></i> Lista de Motos
+                    <span class="badge bg-primary" th:text="${motos.size()}">0</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Placa</th>
+                                <th>Modelo</th>
+                                <th>Pátio</th>
+                                <th>Status</th>
+                                <th>Data Entrada</th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="moto : ${motos}">
+                                <td th:text="${moto.id}">#1</td>
+                                <td>
+                                    <strong th:text="${moto.placa}">ABC1234</strong>
+                                </td>
+                                <td th:text="${moto.modelo}">Honda CG 160</td>
+                                <td>
+                                    <i class="bi bi-building"></i>
+                                    <span th:text="${moto.nomePatio}">Pátio Central</span>
+                                </td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${moto.status == 'DISPONIVEL' ? 'bg-success' : 
+                                                         (moto.status == 'EM_USO' ? 'bg-warning' : 'bg-danger')}"
+                                          th:text="${moto.status}">DISPONIVEL</span>
+                                </td>
+                                <td th:text="${#dates.format(moto.dataEntrada, 'dd/MM/yyyy')}">01/01/2024</td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a th:href="@{/motos/{id}(id=${moto.id})}" 
+                                           class="btn btn-outline-info" 
+                                           title="Visualizar">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a th:href="@{/motos/edit/{id}(id=${moto.id})}" 
+                                           class="btn btn-outline-primary" 
+                                           title="Editar"
+                                           sec:authorize="hasAnyRole('ADMIN', 'GERENTE', 'OPERADOR')">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button type="button" 
+                                                class="btn btn-outline-danger" 
+                                                title="Excluir"
+                                                data-bs-toggle="modal" 
+                                                th:data-bs-target="'#deleteModal' + ${moto.id}"
+                                                sec:authorize="hasAnyRole('ADMIN', 'GERENTE')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- Modal de Confirmação -->
+                                    <div class="modal fade" th:id="'deleteModal' + ${moto.id}" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Confirmar Exclusão</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    Tem certeza que deseja excluir a moto <strong th:text="${moto.placa}"></strong>?
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    <form th:action="@{/motos/delete/{id}(id=${moto.id})}" method="post" class="d-inline">
+                                                        <button type="submit" class="btn btn-danger">Excluir</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(motos)}">
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                    Nenhuma moto encontrada
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

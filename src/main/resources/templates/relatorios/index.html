@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head}">
+    <title>Relatórios - SentinelTrack</title>
+</head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container mt-4">
+        <!-- Cabeçalho -->
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="h3">
+                    <i class="bi bi-graph-up"></i> Relatórios e Analytics
+                </h1>
+                <p class="text-muted">Análise de performance e utilização da frota Mottu</p>
+            </div>
+        </div>
+
+        <!-- Estatísticas Gerais -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h3 class="mb-0" th:text="${totalMotos}">0</h3>
+                                <small>Total de Motos</small>
+                            </div>
+                            <i class="bi bi-motorcycle fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h3 class="mb-0" th:text="${motosDisponiveis}">0</h3>
+                                <small>Disponíveis</small>
+                            </div>
+                            <i class="bi bi-check-circle fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h3 class="mb-0" th:text="${motosEmUso}">0</h3>
+                                <small>Em Uso</small>
+                            </div>
+                            <i class="bi bi-arrow-repeat fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-danger">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h3 class="mb-0" th:text="${motosManutencao}">0</h3>
+                                <small>Manutenção</small>
+                            </div>
+                            <i class="bi bi-tools fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Taxa de Utilização -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Taxa de Utilização</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Disponíveis</span>
+                                <span th:text="${taxaDisponiveis + '%'}">0%</span>
+                            </div>
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-success" 
+                                     th:style="'width: ' + ${taxaDisponiveis} + '%'"
+                                     th:text="${taxaDisponiveis + '%'}">0%</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Em Uso</span>
+                                <span th:text="${taxaEmUso + '%'}">0%</span>
+                            </div>
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-warning" 
+                                     th:style="'width: ' + ${taxaEmUso} + '%'"
+                                     th:text="${taxaEmUso + '%'}">0%</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Manutenção</span>
+                                <span th:text="${taxaManutencao + '%'}">0%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-danger" 
+                                     th:style="'width: ' + ${taxaManutencao} + '%'"
+                                     th:text="${taxaManutencao + '%'}">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-building"></i> Distribuição por Pátio</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Pátio</th>
+                                        <th class="text-center">Motos</th>
+                                        <th class="text-end">%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="patio : ${distribuicaoPatios}">
+                                        <td th:text="${patio.nome}">Pátio Central</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-primary" th:text="${patio.quantidade}">0</span>
+                                        </td>
+                                        <td class="text-end" th:text="${patio.percentual + '%'}">0%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relatórios Disponíveis -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-file-earmark-bar-graph text-primary fs-1 mb-3"></i>
+                        <h5>Relatório de Utilização</h5>
+                        <p class="text-muted">Análise detalhada do uso da frota por período</p>
+                        <button class="btn btn-primary" onclick="gerarRelatorioUso()">
+                            <i class="bi bi-download"></i> Gerar Relatório
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-tools text-warning fs-1 mb-3"></i>
+                        <h5>Relatório de Manutenção</h5>
+                        <p class="text-muted">Histórico e custos de manutenção</p>
+                        <button class="btn btn-warning" onclick="gerarRelatorioManutencao()">
+                            <i class="bi bi-download"></i> Gerar Relatório
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-building text-success fs-1 mb-3"></i>
+                        <h5>Relatório por Pátio</h5>
+                        <p class="text-muted">Performance e ocupação dos pátios</p>
+                        <button class="btn btn-success" onclick="gerarRelatorioPatio()">
+                            <i class="bi bi-download"></i> Gerar Relatório
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Insights e Recomendações -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-lightbulb"></i> Insights e Recomendações</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info" th:if="${taxaDisponiveis > 50}">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Alta disponibilidade:</strong> Você tem <span th:text="${taxaDisponiveis}">0</span>% da frota disponível. 
+                    Considere aumentar a utilização ou redimensionar a frota.
+                </div>
+                <div class="alert alert-warning" th:if="${taxaManutencao > 20}">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>Atenção:</strong> <span th:text="${taxaManutencao}">0</span>% da frota está em manutenção. 
+                    Verifique se há necessidade de manutenção preventiva.
+                </div>
+                <div class="alert alert-success" th:if="${taxaEmUso > 60}">
+                    <i class="bi bi-check-circle"></i>
+                    <strong>Excelente utilização:</strong> <span th:text="${taxaEmUso}">0</span>% da frota está em uso. 
+                    A operação está otimizada!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+    
+    <script>
+        function gerarRelatorioUso() {
+            alert('Gerando relatório de utilização... (Funcionalidade em desenvolvimento)');
+            // Implementar chamada para API de relatórios
+        }
+        
+        function gerarRelatorioManutencao() {
+            alert('Gerando relatório de manutenção... (Funcionalidade em desenvolvimento)');
+        }
+        
+        function gerarRelatorioPatio() {
+            alert('Gerando relatório por pátio... (Funcionalidade em desenvolvimento)');
+        }
+    </script>
+</body>
+</html>

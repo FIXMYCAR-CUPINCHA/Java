@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import fiap.com.br.SentinelTrack.Api.exception.DuplicatePlacaException;
+import fiap.com.br.SentinelTrack.Api.exception.PatioNotFoundException;
 import fiap.com.br.SentinelTrack.Application.dto.CreateMotoDTO;
 import fiap.com.br.SentinelTrack.Application.dto.MotoDTO;
 import fiap.com.br.SentinelTrack.Application.mapper.MotoMapper;
@@ -60,12 +62,12 @@ public class MotoService {
     public MotoDTO criar(CreateMotoDTO createDTO) {
         Optional<Patio> patioOpt = patioService.buscarEntidadePorId(createDTO.getIdPatio());
         if (patioOpt.isEmpty()) {
-            throw new RuntimeException("Pátio não encontrado com ID: " + createDTO.getIdPatio());
+            throw new PatioNotFoundException(createDTO.getIdPatio());
         }
 
         // Verificar se placa já existe
         if (motoRepository.findByPlaca(createDTO.getPlaca()).isPresent()) {
-            throw new RuntimeException("Já existe uma moto com a placa: " + createDTO.getPlaca());
+            throw new DuplicatePlacaException(createDTO.getPlaca());
         }
 
         Moto moto = mapper.toEntity(createDTO, patioOpt.get());
@@ -79,12 +81,12 @@ public class MotoService {
                     // Verificar se a nova placa já existe em outra moto
                     Optional<Moto> existingMoto = motoRepository.findByPlaca(updateDTO.getPlaca());
                     if (existingMoto.isPresent() && !existingMoto.get().getId().equals(id)) {
-                        throw new RuntimeException("Já existe uma moto com a placa: " + updateDTO.getPlaca());
+                        throw new DuplicatePlacaException(updateDTO.getPlaca());
                     }
 
                     Optional<Patio> patioOpt = patioService.buscarEntidadePorId(updateDTO.getIdPatio());
                     if (patioOpt.isEmpty()) {
-                        throw new RuntimeException("Pátio não encontrado com ID: " + updateDTO.getIdPatio());
+                        throw new PatioNotFoundException(updateDTO.getIdPatio());
                     }
 
                     mapper.updateEntity(moto, updateDTO, patioOpt.get());
